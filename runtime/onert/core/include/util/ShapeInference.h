@@ -112,7 +112,7 @@ private:
   // TODO write op starting from L
   // TODO write op starting from M
   // TODO write op starting from N
-  // TODO write op starting from P
+  void visit(const ir::operation::Pow &op);
   void visit(const ir::operation::Reshape &op);
   // TODO write op starting from S
   void visit(const ir::operation::Tanh &op);
@@ -161,7 +161,7 @@ public:
   // TODO write op starting from L
   // TODO write op starting from M
   // TODO write op starting from N
-  // TODO write op starting from P
+  void visit(const ir::operation::Pow &op);
   void visit(const ir::operation::Reshape &op);
   // TODO write op starting from S
   void visit(const ir::operation::Tanh &op);
