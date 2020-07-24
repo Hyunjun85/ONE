@@ -1,0 +1,1 @@
+export LD_LIBRARY_PATH=/data/local/tmp/hj/nnpkg/lib:/data/local/tmp/Product/out/lib
