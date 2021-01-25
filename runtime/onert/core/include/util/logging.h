@@ -17,10 +17,15 @@
 #ifndef __ONERT_UTIL_LOGGING_H__
 #define __ONERT_UTIL_LOGGING_H__
 
+
 #include <iostream>
 #include <cstring>
 
 #include "util/ConfigSource.h"
+
+#ifdef  __ANDROID__
+#include <android/log.h>
+#endif
 
 namespace onert
 {
@@ -68,6 +73,7 @@ inline std::string decorated_name(const char *input)
 } // namespace util
 } // namespace onert
 
+#ifndef __ANDROID__
 #define VERBOSE(name)                        \
   if (::onert::util::logging::ctx.enabled()) \
   std::cout << ::onert::util::logging::decorated_name(#name)
@@ -82,5 +88,21 @@ inline std::string decorated_name(const char *input)
     {                                        \
       METHOD;                                \
   } while (0)
+#else
+#define VERBOSE(name)                        \
+  if (::onert::util::logging::ctx.enabled()) \
+  __android_log_print(ANDROID_LOG_VERBOSE, #name, __VA_ARGS__)
+
+#define VERBOSE_F()                          \
+  if (::onert::util::logging::ctx.enabled()) \
+  __android_log_print(ANDROID_LOG_VERBOSE, __func__, __VA_ARGS__)
+
+#define WHEN_LOG_ENABLED(METHOD)             \
+  if (::onert::util::logging::ctx.enabled()) \
+    do                                       \
+    {                                        \
+      METHOD;                                \
+  } while (0)
+#endif
 
 #endif // __ONERT_UTIL_LOGGING_H__
