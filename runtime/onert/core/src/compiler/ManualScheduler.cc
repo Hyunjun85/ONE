@@ -69,7 +69,7 @@ std::unique_ptr<BackendResolver> ManualScheduler::schedule(const ir::Graph &grap
     op_type_map.emplace(pair.first, BackendManager::get().get(pair.second));
   }
   // By default, Custom uses cpu backend
-  op_type_map[ir::OpCode::Custom] = BackendManager::get().get("cpu");
+  // op_type_map[ir::OpCode::Custom] = BackendManager::get().get("cpu");
 
   graph.operations().iterate([&](const ir::OperationIndex &index, const ir::Operation &operation) {
     auto itr = op_type_map.find(operation.opcode());

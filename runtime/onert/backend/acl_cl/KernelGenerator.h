@@ -23,6 +23,8 @@
 #include "AclTensorRegistry.h"
 #include "TensorManager.h"
 
+#include <backend/CustomKernelBuilder.h>
+
 namespace onert
 {
 namespace backend
@@ -47,6 +49,7 @@ private:
   void visit(const ir::operation::Conv2D &) override;
   void visit(const ir::operation::ConvertFp16ToFp32 &) override;
   void visit(const ir::operation::ConvertFp32ToFp16 &) override;
+  void visit(const ir::operation::Custom &) override;
   void visit(const ir::operation::DepthToSpace &) override;
   void visit(const ir::operation::DepthwiseConv2D &) override;
   void visit(const ir::operation::ElementwiseActivation &) override;

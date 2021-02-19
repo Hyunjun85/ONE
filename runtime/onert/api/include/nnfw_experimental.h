@@ -62,6 +62,9 @@ typedef struct
 NNFW_STATUS nnfw_register_custom_op_info(nnfw_session *session, const char *id,
                                          custom_kernel_registration_info *info);
 
+NNFW_STATUS nnfw_register_custom_cl_op_info(nnfw_session *session, const char *id,
+                                         const char *cl_kernel_path);
+
 /**
  * @brief Get the input tensor index by name
  *
@@ -95,5 +98,8 @@ NNFW_STATUS nnfw_input_tensorindex(nnfw_session *session, const char *tensorname
  * @return     @c NNFW_STATUS_NO_ERROR if successful
  */
 NNFW_STATUS nnfw_output_tensorindex(nnfw_session *session, const char *tensorname, uint32_t *index);
+
+
+
 
 #endif // __NNFW_EXPERIMENTAL_H__

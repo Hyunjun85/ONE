@@ -140,6 +140,8 @@ public:
   //
 
   NNFW_STATUS register_custom_operation(const std::string &id, nnfw_custom_eval eval_func);
+  NNFW_STATUS register_custom_cl_op_info(const std::string &id,
+                                                    const std::string &cl_kernel_path)
   NNFW_STATUS input_tensorindex(const char *tensorname, uint32_t *index);
   NNFW_STATUS output_tensorindex(const char *tensorname, uint32_t *index);
 

@@ -177,6 +177,15 @@ public:
   std::string get_device_version();
 
   /**
+   * @brief Create a custom kernel from the kernel library.
+   * @param[in] kernel_name       Kernel name.
+   * @param[in] build_options_set Kernel build options as a set.
+   * @return The created kernel.
+   */
+  Kernel create_custom_kernel(const std::string &kernel_name,
+                                        const StringSet &build_options_set = {}) const;
+
+  /**
    * @brief Create a kernel from the kernel library.
    * @param[in] kernel_name       Kernel name.
    * @param[in] build_options_set Kernel build options as a set.
@@ -263,6 +272,12 @@ private:
   static const std::map<std::string, std::string>
     _program_source_map; /**< Contains sources for all programs.
                            Used for compile-time kernel inclusion. >*/
+
+  static std::map<std::string, std::string> 
+    _custom_kernel_program_map; /**< Map that associates custom kernel names with programs. */
+  // static std::map<std::string, std::string>
+  //   _custom_program_source_map; /**< Contains sources for all programs.
+  //                          Used for compile-time kernel inclusion. >*/
 };
 } // namespace arm_compute
 #endif /* __ARM_COMPUTE_CLKERNELLIBRARY_EX_H__ */

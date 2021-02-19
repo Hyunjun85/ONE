@@ -87,6 +87,10 @@ const std::map<std::string, std::string> CLKernelLibraryEx::_kernel_program_map 
   {"scale_factor_symm8", "scale_factor.cl"},
 };
 
+std::map<std::string, std::string> CLKernelLibraryEx::_custom_kernel_program_map = {
+  {"hello", "custom.cl"}
+};
+
 const std::map<std::string, std::string> CLKernelLibraryEx::_program_source_map = {
 #ifdef EMBEDDED_KERNELS
   {
@@ -181,6 +185,66 @@ CLKernelLibraryEx &CLKernelLibraryEx::get()
   static CLKernelLibraryEx _kernel_library;
   return _kernel_library;
 }
+
+Kernel CLKernelLibraryEx::create_custom_kernel(const std::string &kernel_name,
+                                        const StringSet &build_options_set) const
+{
+  // Find which program contains the kernel
+  auto kernel_program_it = _custom_kernel_program_map.find(kernel_name);
+
+  if (_custom_kernel_program_map.end() == kernel_program_it)
+  {
+    ARM_COMPUTE_ERROR_VAR("Kernel %s not found in the CLKernelLibrary", kernel_name.c_str());
+  }
+  std::string concat_str;
+
+  if (fp16_supported())
+  {
+    concat_str += " -DARM_COMPUTE_OPENCL_FP16_ENABLED=1 ";
+  }
+
+  if (get_cl_version(_device) == CLVersion::CL20)
+  {
+    concat_str += " -cl-std=CL2.0 ";
+  }
+  else if (arm_non_uniform_workgroup_supported(_device))
+  {
+    concat_str += " -cl-arm-non-uniform-work-group-size ";
+  }
+  else
+  {
+    ARM_COMPUTE_ERROR("Non uniform workgroup size is not supported!!");
+  }
+
+  // Check if the program has been built before with same build options.
+  const std::string program_name = kernel_program_it->second;
+  const std::string build_options = stringify_set(build_options_set) + concat_str;
+
+  const std::string built_program_name = program_name + "_" + build_options;
+  auto built_program_it = _built_programs_map.find(built_program_name);
+
+  cl::Program cl_program;
+
+  if (_built_programs_map.end() != built_program_it)
+  {
+    // If program has been built, retrieve to create kernel from it
+    cl_program = built_program_it->second;
+  }
+  else
+  {
+    // Get program
+    Program program = load_program(program_name);
+
+    // Build program
+    cl_program = program.build(build_options);
+
+    // Add built program to internal map
+    _built_programs_map.emplace(built_program_name, cl_program);
+  }
+
+  // Create and return kernel
+  return Kernel(kernel_name, cl_program);
+}                                        
 
 Kernel CLKernelLibraryEx::create_kernel(const std::string &kernel_name,
                                         const StringSet &build_options_set) const

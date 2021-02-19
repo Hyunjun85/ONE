@@ -732,6 +732,13 @@ NNFW_STATUS nnfw_session::register_custom_operation(const std::string &id,
   return NNFW_STATUS_NO_ERROR;
 }
 
+NNFW_STATUS nnfw_session::register_custom_cl_op_info(const std::string &id,
+                                                    const std::string &cl_kernel_path)
+{
+  // _kernel_registry->registerKernel(id, eval_func);
+  return NNFW_STATUS_NO_ERROR;
+}
+
 static std::string get_op_backend_string(std::string op)
 {
 #define MAP_MACRO(CircleName, OneRTName) {#CircleName, #OneRTName},

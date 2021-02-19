@@ -23,7 +23,7 @@ target_link_libraries(arm_compute_ex PRIVATE arm_compute)
 target_link_libraries(arm_compute_ex PRIVATE nnfw_common)
 target_link_libraries(arm_compute_ex PRIVATE nnfw_coverage)
 # Defines to enable validate check in debug build
-target_compile_definitions(arm_compute_ex PRIVATE EMBEDDED_KERNELS
+target_compile_definitions(arm_compute_ex PRIVATE 
                                                   $<$<CONFIG:Debug>:ARM_COMPUTE_DEBUG_ENABLED ARM_COMPUTE_ASSERTS_ENABLED
                                                                     ARM_COMPUTE_LOGGING_ENABLED>)
 # Validate check functions are not used on release build

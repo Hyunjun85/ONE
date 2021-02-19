@@ -1318,6 +1318,39 @@ void KernelGenerator::visit(const ir::operation::Gather &node)
   _return_fn = asAclFunction(std::move(fn));
 }
 
+void KernelGenerator::visit(const ir::operation::Custom &node)
+{
+  // auto fill_op_info = [&](const ir::OperandIndexSequence &opSeq,
+  //                         std::vector<custom::TypeInfo> &types,
+  //                         std::vector<IPortableTensor *> &tensors) {
+  //   for (auto &idx : opSeq)
+  //   {
+  //     const auto &operand = _ctx.at(idx);
+  //     // TODO make sure using `_current_layout` is correct for custom operations
+  //     types.emplace_back(custom::TypeInfo{operand.shape(), operand.typeInfo().type()});
+  //     auto in_tensor = _tensor_reg->getAclTensor(idx);
+  //     tensors.emplace_back(in_tensor);
+  //   }
+  // };
+
+  backend::custom::CustomKernelConfigParams params{};
+
+  // fill_op_info(node.getInputs(), params.input_types, params.input_tensors);
+  // fill_op_info(node.getOutputs(), params.output_types, params.output_tensors);
+
+  const auto ofm_index{node.getOutputs().at(0)};
+  const auto ifm_index{node.getInputs().at(0)};
+
+  auto ifm_tensor = _tensor_reg->getAclTensor(ofm_index);  
+  auto ofm_tensor = _tensor_reg->getAclTensor(ofm_index);
+
+  auto fn = acl_common::generateLayer<arm_compute::CLCustomLayerEx>(
+    ifm_tensor->handle(), ofm_tensor->handle());
+
+  _return_fn = asAclFunction(std::move(fn));
+
+}
+
 void KernelGenerator::visit(const ir::operation::ArgMinMax &node)
 {
   const auto ofm_index{node.getOutputs().at(0)};
