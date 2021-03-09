@@ -59,7 +59,6 @@ const std::map<std::string, std::string> CLKernelLibraryEx::_kernel_program_map 
   {"arg_min_max_ex_y", "arg_min_max_ex.cl"},
   {"arg_min_max_ex_z", "arg_min_max_ex.cl"},
   {"arg_min_max_ex_w", "arg_min_max_ex.cl"},
-  {"binary_logical_op", "binary_logical_op.cl"},
   {"cast_bool", "cast.cl"},
   {"embedding_lookup", "embedding_lookup.cl"},
   {"gather_ex", "gather_ex.cl"},
@@ -90,6 +89,10 @@ const std::map<std::string, std::string> CLKernelLibraryEx::_kernel_program_map 
 const std::map<std::string, std::string> CLKernelLibraryEx::_program_source_map = {
 #ifdef EMBEDDED_KERNELS
   {
+    "activation_float_helpers.h",
+#include "./cl_kernels/activation_float_helpers.hembed"
+  },
+  {
     "arg_min_max_ex.cl",
 #include "./cl_kernels/arg_min_max_ex.clembed"
   },
@@ -110,6 +113,10 @@ const std::map<std::string, std::string> CLKernelLibraryEx::_program_source_map 
 #include "./cl_kernels/gemmlowp_ex.clembed"
   },
   {
+    "gemm_helpers.h",
+#include "./cl_kernels/gemm_helpers.hembed"
+  },
+  {
     "hashtable_lookup.cl",
 #include "./cl_kernels/hashtable_lookup.clembed"
   },
@@ -126,8 +133,12 @@ const std::map<std::string, std::string> CLKernelLibraryEx::_program_source_map 
 #include "./cl_kernels/instance_normalization_ex.clembed"
   },
   {
-    "binary_logical_op.cl",
-#include "./cl_kernels/binary_logical_op.clembed"
+    "gemm.cl",
+#include "./cl_kernels/gemm.clembed"
+  },
+  {
+    "memset.cl",
+#include "./cl_kernels/memset.clembed"
   },
   {
     "multiply_scale_factor.cl",
@@ -148,6 +159,10 @@ const std::map<std::string, std::string> CLKernelLibraryEx::_program_source_map 
   {
     "reduce_operation.cl",
 #include "./cl_kernels/reduce_operation.clembed"
+  },
+  {
+    "repeat.h",
+#include "./cl_kernels/repeat.hembed"
   },
   {
     "scale_factor.cl",
