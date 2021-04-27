@@ -1,0 +1,60 @@
+/*
+ * Copyright (c) 2021 Samsung Electronics Co., Ltd. All Rights Reserved
+ * Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef __ONERT_BACKEND_GPU_CL_SELECTORS_SUBGRAPH_H__
+#define __ONERT_BACKEND_GPU_CL_SELECTORS_SUBGRAPH_H__
+
+#include <memory>
+#include <vector>
+
+#include "../kernels/GpuOperation.h"
+#include "../TensorType.h"
+#include "../Model.h"
+
+namespace onert
+{
+namespace backend
+{
+namespace gpu_cl
+{
+
+struct GPUOperationWithRefs
+{
+  std::unique_ptr<GPUOperation> operation;
+
+  // input and output ids can be positive or negative.
+  // if we have positive id, we will use preallocated tensor from GraphFloat32
+  // otherwise, we will use ids for newly allocated tensors
+  std::vector<int> input_ids;
+  std::vector<int> output_ids;
+};
+
+struct GPUOperationsSubgraph
+{
+  std::vector<GPUOperationWithRefs> operations;
+  std::vector<std::pair<BHWC, TensorDescriptor>> new_tensors;
+};
+
+std::unique_ptr<GPUOperation> *InitSingleOpSubgraph(const std::vector<Value *> &inputs,
+                                                    const std::vector<Value *> &outputs,
+                                                    GPUOperationsSubgraph *gpu_subgraph);
+
+} // namespace gpu_cl
+} // namespace backend
+} // namespace onert
+
+#endif // __ONERT_BACKEND_GPU_CL_SELECTORS_SUBGRAPH_H__
