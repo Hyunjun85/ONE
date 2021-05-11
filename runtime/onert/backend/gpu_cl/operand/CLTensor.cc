@@ -16,10 +16,10 @@
 
 #include "CLTensor.h"
 
-#include "../../open_cl/Buffer.h"
-#include "../../open_cl/ClContext.h"
-#include "../../open_cl/Tensor.h"
-#include "../../open_cl/TensorType.h"
+#include "open_cl/Buffer.h"
+#include "open_cl/ClContext.h"
+#include "open_cl/Tensor.h"
+#include "open_cl/TensorType.h"
 
 namespace onert
 {
@@ -39,11 +39,7 @@ const Tensor *CLTensor::handle() const { return _tensor.get(); }
 
 Tensor *CLTensor::handle() { return _tensor.get(); }
 
-void CLTensor::setBuffer(void *host_ptr)
-{
-  // TODO
-  (void)host_ptr;
-}
+void CLTensor::setBuffer(void *host_ptr) { (void)host_ptr; }
 
 } // namespace operand
 } // namespace gpu_cl

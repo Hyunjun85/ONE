@@ -1,11 +1,12 @@
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd. All Rights Reserved
+ * Copyright 2019 The TensorFlow Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,10 +15,13 @@
  * limitations under the License.
  */
 
-#include "Config.h"
+#ifndef TENSORFLOW_LITE_DELEGATES_GPU_CL_KERNELS_ELEMENTWISE_H_
+#define TENSORFLOW_LITE_DELEGATES_GPU_CL_KERNELS_ELEMENTWISE_H_
 
-#include "open_cl/OpenclWrapper.h"
-#include "open_cl/Status.h"
+#include <string>
+
+#include "GpuOperation.h"
+#include "open_cl/Operations.h"
 
 namespace onert
 {
@@ -26,19 +30,13 @@ namespace backend
 namespace gpu_cl
 {
 
-Config::~Config() {}
-
-bool Config::initialize()
-{
-  if (LoadOpenCL().ok()) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-ir::Layout Config::supportLayout(const ir::Operation &, ir::Layout) { return ir::Layout::NHWC; }
+// Creates simple two input(2 runtime tensors) operation, for example
+// sub, div and etc.
+GPUOperation CreateElementwiseTwoInput(const OperationDef &definition, const OperationType &op_type,
+                                       const BHWC &shape);
 
 } // namespace gpu_cl
 } // namespace backend
 } // namespace onert
+
+#endif // TENSORFLOW_LITE_DELEGATES_GPU_CL_KERNELS_ELEMENTWISE_H_

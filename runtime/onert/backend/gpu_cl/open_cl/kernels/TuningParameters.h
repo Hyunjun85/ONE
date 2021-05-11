@@ -1,11 +1,12 @@
 /*
  * Copyright (c) 2021 Samsung Electronics Co., Ltd. All Rights Reserved
+ * Copyright 2019 The TensorFlow Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,10 +15,11 @@
  * limitations under the License.
  */
 
-#include "Config.h"
+#ifndef __ONERT_BACKEND_GPU_CL_KERNELS_TUNING_PARAMETERS_H__
+#define __ONERT_BACKEND_GPU_CL_KERNELS_TUNING_PARAMETERS_H__
 
-#include "open_cl/OpenclWrapper.h"
-#include "open_cl/Status.h"
+#include "open_cl/ClCommandQueue.h"
+#include "open_cl/DeviceInfo.h"
 
 namespace onert
 {
@@ -26,19 +28,21 @@ namespace backend
 namespace gpu_cl
 {
 
-Config::~Config() {}
-
-bool Config::initialize()
+enum class TuningType
 {
-  if (LoadOpenCL().ok()) {
-    return true;
-  } else {
-    return false;
-  }
-}
+  EXHAUSTIVE,
+  FAST
+};
 
-ir::Layout Config::supportLayout(const ir::Operation &, ir::Layout) { return ir::Layout::NHWC; }
+struct TuningParameters
+{
+  ProfilingCommandQueue *queue;
+  const DeviceInfo *info;
+  TuningType tuning_type = TuningType::EXHAUSTIVE;
+};
 
 } // namespace gpu_cl
 } // namespace backend
 } // namespace onert
+
+#endif // __ONERT_BACKEND_GPU_CL_KERNELS_TUNING_PARAMETERS_H__
