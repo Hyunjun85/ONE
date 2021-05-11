@@ -20,8 +20,8 @@
 #include <exec/IFunction.h>
 #include <memory>
 
-#include "../open_cl/kernels/GpuOperation.h"
-#include "../open_cl/ClCommandQueue.h"
+#include "open_cl/kernels/GpuOperation.h"
+#include "open_cl/ClCommandQueue.h"
 
 namespace onert
 {

@@ -21,21 +21,22 @@
 #include <string>
 #include <vector>
 
-#include "../Arguments.h"
-#include "../Buffer.h"
-#include "../ClCommandQueue.h"
-#include "../ClContext.h"
-#include "../ClDevice.h"
-#include "../ClKernel.h"
-#include "../ClProgram.h"
-#include "../DeviceInfo.h"
 #include "TuningParameters.h"
-#include "../Precision.h"
-#include "../Tensor.h"
-#include "../TensorType.h"
-#include "../DataType.h"
-#include "../Types.h"
-#include "../ProgramCache.h"
+
+#include "open_cl/Arguments.h"
+#include "open_cl/Buffer.h"
+#include "open_cl/ClCommandQueue.h"
+#include "open_cl/ClContext.h"
+#include "open_cl/ClDevice.h"
+#include "open_cl/ClKernel.h"
+#include "open_cl/ClProgram.h"
+#include "open_cl/DataType.h"
+#include "open_cl/DeviceInfo.h"
+#include "open_cl/Precision.h"
+#include "open_cl/ProgramCache.h"
+#include "open_cl/Tensor.h"
+#include "open_cl/TensorType.h"
+#include "open_cl/Types.h"
 
 namespace onert
 {

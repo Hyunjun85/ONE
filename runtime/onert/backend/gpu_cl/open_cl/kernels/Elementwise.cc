@@ -23,10 +23,10 @@
 #include "absl/types/variant.h"
 #include "absl/strings/substitute.h"
 #include "GpuOperation.h"
-#include "../Operations.h"
+#include "open_cl/Operations.h"
 
 #include "Util.h"
-#include "../StorageTypeUtil.h"
+#include "open_cl/StorageTypeUtil.h"
 
 namespace onert
 {

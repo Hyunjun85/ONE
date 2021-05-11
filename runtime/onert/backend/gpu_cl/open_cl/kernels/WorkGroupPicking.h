@@ -22,10 +22,10 @@
 
 #include "TuningParameters.h"
 
-#include "../ClKernel.h"
-#include "../DeviceInfo.h"
-#include "../Types.h"
-#include "../WorkgroupSelection.h"
+#include "open_cl/ClKernel.h"
+#include "open_cl/DeviceInfo.h"
+#include "open_cl/Types.h"
+#include "open_cl/WorkgroupSelection.h"
 
 namespace onert
 {

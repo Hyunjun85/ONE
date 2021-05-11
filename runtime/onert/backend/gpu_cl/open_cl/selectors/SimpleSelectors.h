@@ -20,10 +20,10 @@
 
 #include <memory>
 
-#include "../ClDevice.h"
-#include "../kernels/GpuOperation.h"
-#include "../Operations.h"
-#include "../Shape.h"
+#include "open_cl/ClDevice.h"
+#include "open_cl/kernels/GpuOperation.h"
+#include "open_cl/Operations.h"
+#include "open_cl/Shape.h"
 
 namespace onert
 {

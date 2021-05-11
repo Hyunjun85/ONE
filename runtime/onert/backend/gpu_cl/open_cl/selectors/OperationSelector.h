@@ -15,11 +15,17 @@
  * limitations under the License.
  */
 
-#ifndef __ONERT_BACKEND_GPU_CL_KERNELS_TUNING_PARAMETERS_H__
-#define __ONERT_BACKEND_GPU_CL_KERNELS_TUNING_PARAMETERS_H__
+#ifndef TENSORFLOW_LITE_DELEGATES_GPU_CL_SELECTORS_OPERATION_SELECTOR_H_
+#define TENSORFLOW_LITE_DELEGATES_GPU_CL_SELECTORS_OPERATION_SELECTOR_H_
 
-#include "../ClCommandQueue.h"
-#include "../DeviceInfo.h"
+#include <memory>
+
+#include "Subgraph.h"
+
+#include "open_cl/kernels/GpuOperation.h"
+#include "open_cl/ModelHints.h"
+#include "open_cl/TensorType.h"
+#include "open_cl/Model.h"
 
 namespace onert
 {
@@ -28,21 +34,12 @@ namespace backend
 namespace gpu_cl
 {
 
-enum class TuningType
-{
-  EXHAUSTIVE,
-  FAST
-};
-
-struct TuningParameters
-{
-  ProfilingCommandQueue *queue;
-  const DeviceInfo *info;
-  TuningType tuning_type = TuningType::EXHAUSTIVE;
-};
+bool GPUOperationFromNode(const OperationDef &op_def, const std::vector<Value *> &inputs,
+                          const std::vector<Value *> &outputs, const Node &node,
+                          GPUOperationsSubgraph *gpu_subgraph);
 
 } // namespace gpu_cl
 } // namespace backend
 } // namespace onert
 
-#endif // __ONERT_BACKEND_GPU_CL_KERNELS_TUNING_PARAMETERS_H__
+#endif // TENSORFLOW_LITE_DELEGATES_GPU_CL_SELECTORS_OPERATION_SELECTOR_H_

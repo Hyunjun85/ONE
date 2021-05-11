@@ -21,7 +21,7 @@
 #include <string>
 
 #include "GpuOperation.h"
-#include "../Operations.h"
+#include "open_cl/Operations.h"
 
 namespace onert
 {

@@ -21,13 +21,13 @@
 #include <string>
 #include <vector>
 
-#include "../DeviceInfo.h"
-#include "../Precision.h"
-#include "../DataType.h"
-#include "../Shape.h"
-#include "../Tensor.h"
-#include "../Types.h"
-#include "../Util.h"
+#include "open_cl/DeviceInfo.h"
+#include "open_cl/Precision.h"
+#include "open_cl/DataType.h"
+#include "open_cl/Shape.h"
+#include "open_cl/Tensor.h"
+#include "open_cl/Types.h"
+#include "open_cl/Util.h"
 
 namespace onert
 {

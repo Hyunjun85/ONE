@@ -22,7 +22,7 @@
 
 #include "absl/strings/str_cat.h"
 #include "Util.h"
-#include "../Util.h"
+#include "open_cl/Util.h"
 
 namespace onert
 {

@@ -20,7 +20,7 @@
 #include <memory>
 #include <set>
 
-#include "../kernels/Add.h"
+#include "open_cl/kernels/Add.h"
 
 namespace onert
 {

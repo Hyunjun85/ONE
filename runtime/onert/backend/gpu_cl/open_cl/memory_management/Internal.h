@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "Types.h"
-#include "../Types.h"
+#include "open_cl/Types.h"
 
 namespace onert
 {

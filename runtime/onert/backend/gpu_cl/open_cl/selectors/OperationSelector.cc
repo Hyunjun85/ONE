@@ -17,16 +17,16 @@
 
 #include "OperationSelector.h"
 
-#include "../ClDevice.h"
-#include "../kernels/Elementwise.h"
-#include "../kernels/Transpose.h"
-#include "../StorageTypeUtil.h"
-#include "../selectors/SimpleSelectors.h"
-#include "../TensorType.h"
-#include "../DataType.h"
-#include "../Operations.h"
-#include "../Shape.h"
-#include "../InternalTensor.h"
+#include "open_cl/ClDevice.h"
+#include "open_cl/kernels/Elementwise.h"
+#include "open_cl/kernels/Transpose.h"
+#include "open_cl/StorageTypeUtil.h"
+#include "open_cl/selectors/SimpleSelectors.h"
+#include "open_cl/TensorType.h"
+#include "open_cl/DataType.h"
+#include "open_cl/Operations.h"
+#include "open_cl/Shape.h"
+#include "open_cl/InternalTensor.h"
 
 namespace onert
 {

@@ -19,7 +19,7 @@
 
 #include "Util.h"
 #include "WorkGroupPicking.h"
-#include "../AccessType.h"
+#include "open_cl/AccessType.h"
 
 namespace onert
 {

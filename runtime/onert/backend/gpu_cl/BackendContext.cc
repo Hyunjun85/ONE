@@ -19,8 +19,8 @@
 #include "TensorBuilder.h"
 #include "KernelGenerator.h"
 
-#include "../open_cl/selectors/Subgraph.h"
-#include "../open_cl/selectors/OperationSelector.h"
+#include "open_cl/selectors/Subgraph.h"
+#include "open_cl/selectors/OperationSelector.h"
 
 #include "util/logging.h"
 #include "ir/Index.h"

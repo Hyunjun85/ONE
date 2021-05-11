@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-#include "Subgraph.h"
+#ifndef __ONERT_BACKEND_GPU_CL_SELECTORS_SUBGRAPH_H__
+#define __ONERT_BACKEND_GPU_CL_SELECTORS_SUBGRAPH_H__
 
 #include <memory>
+#include <vector>
 
-#include "../kernels/GpuOperation.h"
-#include "../TensorType.h"
-#include "../Model.h"
+#include "open_cl/kernels/GpuOperation.h"
+#include "open_cl/TensorType.h"
+#include "open_cl/Model.h"
 
 namespace onert
 {
@@ -30,25 +32,29 @@ namespace backend
 namespace gpu_cl
 {
 
+struct GPUOperationWithRefs
+{
+  std::unique_ptr<GPUOperation> operation;
+
+  // input and output ids can be positive or negative.
+  // if we have positive id, we will use preallocated tensor from GraphFloat32
+  // otherwise, we will use ids for newly allocated tensors
+  std::vector<int> input_ids;
+  std::vector<int> output_ids;
+};
+
+struct GPUOperationsSubgraph
+{
+  std::vector<GPUOperationWithRefs> operations;
+  std::vector<std::pair<BHWC, TensorDescriptor>> new_tensors;
+};
+
 std::unique_ptr<GPUOperation> *InitSingleOpSubgraph(const std::vector<Value *> &inputs,
                                                     const std::vector<Value *> &outputs,
-                                                    GPUOperationsSubgraph *gpu_subgraph)
-{
-  gpu_subgraph->operations.clear();
-  gpu_subgraph->new_tensors.clear();
-  gpu_subgraph->operations.push_back({});
-  for (uint32_t i = 0; i < inputs.size(); ++i)
-  {
-    gpu_subgraph->operations[0].input_ids.push_back(inputs[i]->id);
-  }
-  for (uint32_t i = 0; i < outputs.size(); ++i)
-  {
-    gpu_subgraph->operations[0].output_ids.push_back(outputs[i]->id);
-  }
-
-  return &gpu_subgraph->operations[0].operation;
-}
+                                                    GPUOperationsSubgraph *gpu_subgraph);
 
 } // namespace gpu_cl
 } // namespace backend
 } // namespace onert
+
+#endif // __ONERT_BACKEND_GPU_CL_SELECTORS_SUBGRAPH_H__

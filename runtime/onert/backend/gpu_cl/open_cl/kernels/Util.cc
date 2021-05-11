@@ -22,8 +22,8 @@
 #include <string>
 #include <vector>
 
-#include "../Precision.h"
-#include "../DataType.h"
+#include "open_cl/Precision.h"
+#include "open_cl/DataType.h"
 
 namespace onert
 {

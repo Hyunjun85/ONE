@@ -22,8 +22,8 @@
 #include <set>
 #include <vector>
 
-#include "../Util.h"
-#include "../Types.h"
+#include "open_cl/Util.h"
+#include "open_cl/Types.h"
 
 namespace onert
 {

@@ -15,14 +15,13 @@
  * limitations under the License.
  */
 
-#ifndef TENSORFLOW_LITE_DELEGATES_GPU_CL_KERNELS_ADD_H_
-#define TENSORFLOW_LITE_DELEGATES_GPU_CL_KERNELS_ADD_H_
-
-#include <string>
-#include <vector>
+#ifndef TENSORFLOW_LITE_DELEGATES_GPU_CL_KERNELS_TRANSPOSE_H_
+#define TENSORFLOW_LITE_DELEGATES_GPU_CL_KERNELS_TRANSPOSE_H_
 
 #include "GpuOperation.h"
-#include "../Operations.h"
+
+#include "open_cl/Operations.h"
+#include "open_cl/Types.h"
 
 namespace onert
 {
@@ -30,14 +29,10 @@ namespace backend
 {
 namespace gpu_cl
 {
-
-// Add operation supports not equal tensors on input (for possibility to
-// remove Padding operation with zeroes in channels dimension)
-GPUOperation CreateAdd(const OperationDef &definition, const std::vector<int> &channels,
-                       int dst_channels);
+GPUOperation CreateTranspose(const OperationDef &definition, const TransposeAttributes &attr);
 
 } // namespace gpu_cl
 } // namespace backend
 } // namespace onert
 
-#endif // TENSORFLOW_LITE_DELEGATES_GPU_CL_KERNELS_ADD_H_
+#endif // TENSORFLOW_LITE_DELEGATES_GPU_CL_KERNELS_TRANSPOSE_H_

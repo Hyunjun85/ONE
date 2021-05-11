@@ -16,7 +16,7 @@
 
 #include "ICLTensor.h"
 
-#include "../../open_cl/OpenclWrapper.h"
+#include "open_cl/OpenclWrapper.h"
 
 namespace onert
 {
