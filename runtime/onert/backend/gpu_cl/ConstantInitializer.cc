@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-#include "Config.h"
-
-#include "open_cl/OpenclWrapper.h"
-#include "open_cl/Status.h"
+#include "ConstantInitializer.h"
 
 namespace onert
 {
@@ -26,21 +23,12 @@ namespace backend
 namespace gpu_cl
 {
 
-Config::~Config() {}
-
-bool Config::initialize()
+ConstantInitializer::ConstantInitializer(const ir::Operands &operands,
+                                         const std::shared_ptr<ITensorRegistry> &tensor_reg)
+  : ClConstantInitializer{operands, tensor_reg}
 {
-  if (LoadOpenCL().ok())
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  // DO NOTHING
 }
-
-ir::Layout Config::supportLayout(const ir::Operation &, ir::Layout) { return ir::Layout::NHWC; }
 
 } // namespace gpu_cl
 } // namespace backend

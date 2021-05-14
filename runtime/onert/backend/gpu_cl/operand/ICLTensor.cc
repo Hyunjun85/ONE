@@ -41,7 +41,8 @@ void ICLTensor::enqueueWriteBuffer(const void *ptr, bool)
   {
     case TensorStorageType::BUFFER:
     case TensorStorageType::IMAGE_BUFFER:
-      if (!_queue->EnqueueWriteBuffer(handle()->GetMemoryPtr(), total_size(), ptr).ok()) {
+      if (!_queue->EnqueueWriteBuffer(handle()->GetMemoryPtr(), total_size(), ptr).ok())
+      {
         return;
       }
       break;
@@ -49,7 +50,9 @@ void ICLTensor::enqueueWriteBuffer(const void *ptr, bool)
     case TensorStorageType::TEXTURE_2D:
     case TensorStorageType::TEXTURE_3D:
     case TensorStorageType::SINGLE_TEXTURE_2D:
-      if (!_queue->EnqueueWriteImage(handle()->GetMemoryPtr(), handle()->GetFullTensorRegion(), ptr).ok()) {
+      if (!_queue->EnqueueWriteImage(handle()->GetMemoryPtr(), handle()->GetFullTensorRegion(), ptr)
+             .ok())
+      {
         return;
       }
       break;
@@ -64,7 +67,8 @@ void ICLTensor::enqueueReadBuffer(void *ptr, bool)
   {
     case TensorStorageType::BUFFER:
     case TensorStorageType::IMAGE_BUFFER:
-      if (!_queue->EnqueueReadBuffer(handle()->GetMemoryPtr(), total_size(), ptr).ok()){
+      if (!_queue->EnqueueReadBuffer(handle()->GetMemoryPtr(), total_size(), ptr).ok())
+      {
         return;
       }
       break;
@@ -72,7 +76,9 @@ void ICLTensor::enqueueReadBuffer(void *ptr, bool)
     case TensorStorageType::TEXTURE_2D:
     case TensorStorageType::TEXTURE_3D:
     case TensorStorageType::SINGLE_TEXTURE_2D:
-      if (!_queue->EnqueueReadImage(handle()->GetMemoryPtr(), handle()->GetFullTensorRegion(), ptr).ok()){
+      if (!_queue->EnqueueReadImage(handle()->GetMemoryPtr(), handle()->GetFullTensorRegion(), ptr)
+             .ok())
+      {
         return;
       }
       break;

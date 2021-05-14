@@ -44,18 +44,22 @@ public:
     _creation_context = creation_context;
   }
 
-  void run() override {
-      if (!_gpu_operation->AddToQueue(_creation_context->queue).ok()){
-        return;
-      }
+  void run() override
+  {
+    if (!_gpu_operation->AddToQueue(_creation_context->queue).ok())
+    {
+      return;
     }
+  }
 
   void prepare() override
   {
-    if (!_gpu_operation->Compile(*_creation_context).ok()) {
+    if (!_gpu_operation->Compile(*_creation_context).ok())
+    {
       return;
     }
-    if (!_gpu_operation->UpdateParams().ok()) {
+    if (!_gpu_operation->UpdateParams().ok())
+    {
       return;
     }
   }

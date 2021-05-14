@@ -51,7 +51,8 @@ public:
     auto context = std::make_unique<gpu_cl::BackendContext>(this, std::move(data));
 
     auto environment = std::make_unique<Environment>();
-    if (!CreateEnvironment(environment.get()).ok()) {
+    if (!CreateEnvironment(environment.get()).ok())
+    {
       return nullptr;
     }
     auto tm = createTensorManager(&environment->context());
@@ -74,6 +75,7 @@ public:
     cc->queue = environment->queue();
     cc->cache = environment->program_cache();
     context->kernel_gen = std::make_shared<KernelGenerator>(graph, tb, tr, cc);
+    context->constant_initializer = std::make_shared<ConstantInitializer>(operands, tr);
     return context;
   }
 

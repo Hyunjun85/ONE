@@ -160,34 +160,34 @@ void CLProgram::Release()
   }
 }
 
-absl::Status CLProgram::GetBinary(std::vector<uint8_t>* result) const {
+absl::Status CLProgram::GetBinary(std::vector<uint8_t> *result) const
+{
   size_t binary_size;
   RETURN_IF_ERROR(GetBinarySize(program_, &binary_size));
   result->resize(result->size() + binary_size);
-  uint8_t* binary_ptr = result->data() + result->size() - binary_size;
-  cl_int error_code = clGetProgramInfo(program_, CL_PROGRAM_BINARIES,
-                                       binary_size, &binary_ptr, nullptr);
-  if (error_code != CL_SUCCESS) {
-    return absl::UnknownError(absl::StrCat("Failed to get program binary - ",
-                                           CLErrorCodeToString(error_code)));
+  uint8_t *binary_ptr = result->data() + result->size() - binary_size;
+  cl_int error_code =
+    clGetProgramInfo(program_, CL_PROGRAM_BINARIES, binary_size, &binary_ptr, nullptr);
+  if (error_code != CL_SUCCESS)
+  {
+    return absl::UnknownError(
+      absl::StrCat("Failed to get program binary - ", CLErrorCodeToString(error_code)));
   }
   return absl::OkStatus();
 }
 
-
-absl::Status CreateCLProgram(const std::string& code,
-                             const std::string& compiler_options,
-                             const CLContext& context, const CLDevice& device,
-                             CLProgram* result) {
+absl::Status CreateCLProgram(const std::string &code, const std::string &compiler_options,
+                             const CLContext &context, const CLDevice &device, CLProgram *result)
+{
   int error_code;
-  const char* source = code.c_str();
+  const char *source = code.c_str();
 
-  cl_program program = clCreateProgramWithSource(context.context(), 1, &source,
-                                                 nullptr, &error_code);
-  if (!program || error_code != CL_SUCCESS) {
+  cl_program program =
+    clCreateProgramWithSource(context.context(), 1, &source, nullptr, &error_code);
+  if (!program || error_code != CL_SUCCESS)
+  {
     return absl::UnknownError(
-        absl::StrCat("Failed to create compute program - ",
-                     CLErrorCodeToString(error_code)));
+      absl::StrCat("Failed to create compute program - ", CLErrorCodeToString(error_code)));
   }
 
   *result = CLProgram(program, device.id());
@@ -195,26 +195,25 @@ absl::Status CreateCLProgram(const std::string& code,
   return absl::OkStatus();
 }
 
-absl::Status CreateCLProgramFromBinary(const CLContext& context,
-                                       const CLDevice& device,
-                                       absl::Span<const uint8_t> binary,
-                                       CLProgram* result) {
+absl::Status CreateCLProgramFromBinary(const CLContext &context, const CLDevice &device,
+                                       absl::Span<const uint8_t> binary, CLProgram *result)
+{
   cl_int binary_status;
   cl_int error_code;
   cl_device_id devices_list[] = {device.id()};
   size_t binary_size = binary.size();
-  const uint8_t* binary_pointer = binary.data();
-  cl_program program = clCreateProgramWithBinary(
-      context.context(), 1, devices_list, &binary_size, &binary_pointer,
-      &binary_status, &error_code);
-  if (binary_status != CL_SUCCESS) {
+  const uint8_t *binary_pointer = binary.data();
+  cl_program program = clCreateProgramWithBinary(context.context(), 1, devices_list, &binary_size,
+                                                 &binary_pointer, &binary_status, &error_code);
+  if (binary_status != CL_SUCCESS)
+  {
     return absl::UnknownError(absl::StrCat(
-        "Something wrong with binary after clCreateProgramWithBinary - ",
-        binary_status));
+      "Something wrong with binary after clCreateProgramWithBinary - ", binary_status));
   }
-  if (error_code != CL_SUCCESS) {
-    return absl::UnknownError(absl::StrCat("Failed to create program - ",
-                                           CLErrorCodeToString(error_code)));
+  if (error_code != CL_SUCCESS)
+  {
+    return absl::UnknownError(
+      absl::StrCat("Failed to create program - ", CLErrorCodeToString(error_code)));
   }
   *result = CLProgram(program, device.id());
   return BuildProgram(program, device, "");

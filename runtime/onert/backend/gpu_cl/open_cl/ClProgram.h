@@ -85,15 +85,11 @@ private:
   cl_device_id device_id_ = nullptr;
 };
 
-absl::Status CreateCLProgram(const std::string& code,
-                             const std::string& compiler_options,
-                             const CLContext& context, const CLDevice& device,
-                             CLProgram* result);
+absl::Status CreateCLProgram(const std::string &code, const std::string &compiler_options,
+                             const CLContext &context, const CLDevice &device, CLProgram *result);
 
-absl::Status CreateCLProgramFromBinary(const CLContext& context,
-                                       const CLDevice& device,
-                                       absl::Span<const uint8_t> binary,
-                                       CLProgram* result);
+absl::Status CreateCLProgramFromBinary(const CLContext &context, const CLDevice &device,
+                                       absl::Span<const uint8_t> binary, CLProgram *result);
 
 } // namespace gpu_cl
 } // namespace backend

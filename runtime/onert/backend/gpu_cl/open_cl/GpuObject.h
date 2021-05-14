@@ -169,15 +169,11 @@ public:
     state_vars_[key] = value;
   }
 
-  virtual std::string PerformConstExpr(const std::string &) const
-  {
-    return "";
-  }
+  virtual std::string PerformConstExpr(const std::string &) const { return ""; }
 
-  virtual absl::Status PerformSelector(
-      const std::string& , const std::vector<std::string>& ,
-      const std::vector<std::string>& ,
-      std::string* result) const {
+  virtual absl::Status PerformSelector(const std::string &, const std::vector<std::string> &,
+                                       const std::vector<std::string> &, std::string *result) const
+  {
     *result = "";
     return absl::OkStatus();
   }
@@ -214,7 +210,7 @@ public:
   GPUObject &operator=(const GPUObject &) = delete;
   virtual ~GPUObject() = default;
   virtual absl::Status GetGPUResources(const GPUObjectDescriptor *obj_ptr,
-                               GPUResourcesWithValue *resources) const = 0;
+                                       GPUResourcesWithValue *resources) const = 0;
 };
 
 using GPUObjectPtr = std::unique_ptr<GPUObject>;

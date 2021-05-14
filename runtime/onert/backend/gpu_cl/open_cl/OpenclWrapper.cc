@@ -63,21 +63,25 @@ void LoadOpenCLFunctions(HMODULE libopencl);
 void LoadOpenCLFunctions(void *libopencl, bool use_wrapper);
 #endif
 
-absl::Status LoadOpenCL() {
+absl::Status LoadOpenCL()
+{
 #ifdef __WINDOWS__
   HMODULE libopencl = LoadLibraryA("OpenCL.dll");
-  if (libopencl) {
+  if (libopencl)
+  {
     LoadOpenCLFunctions(libopencl);
     return absl::OkStatus();
-  } else {
+  }
+  else
+  {
     DWORD error_code = GetLastError();
-    return absl::UnknownError(absl::StrCat(
-        "Can not open OpenCL library on this device, error code - ",
-        error_code));
+    return absl::UnknownError(
+      absl::StrCat("Can not open OpenCL library on this device, error code - ", error_code));
   }
 #else
-  void* libopencl = dlopen("libOpenCL.so", RTLD_NOW | RTLD_LOCAL);
-  if (libopencl) {
+  void *libopencl = dlopen("libOpenCL.so", RTLD_NOW | RTLD_LOCAL);
+  if (libopencl)
+  {
     LoadOpenCLFunctions(libopencl, false);
     return absl::OkStatus();
   }
@@ -86,20 +90,21 @@ absl::Status LoadOpenCL() {
 #ifdef __ANDROID__
   // Pixel phone or auto?
   libopencl = dlopen("libOpenCL-pixel.so", RTLD_NOW | RTLD_LOCAL);
-  if (!libopencl) {
+  if (!libopencl)
+  {
     libopencl = dlopen("libOpenCL-car.so", RTLD_NOW | RTLD_LOCAL);
   }
-  if (libopencl) {
+  if (libopencl)
+  {
     typedef void (*enableOpenCL_t)();
     enableOpenCL_t enableOpenCL =
-        reinterpret_cast<enableOpenCL_t>(dlsym(libopencl, "enableOpenCL"));
+      reinterpret_cast<enableOpenCL_t>(dlsym(libopencl, "enableOpenCL"));
     enableOpenCL();
     LoadOpenCLFunctions(libopencl, true);
     return absl::OkStatus();
   }
 #endif
-  return absl::UnknownError(
-      absl::StrCat("Can not open OpenCL library on this device - ", error));
+  return absl::UnknownError(absl::StrCat("Can not open OpenCL library on this device - ", error));
 #endif
 }
 

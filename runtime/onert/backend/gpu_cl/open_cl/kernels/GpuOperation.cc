@@ -224,34 +224,38 @@ void GPUOperation::AddDstTensor(const std::string &tensor_name, const TensorDesc
   args_.AddObjectRef(tensor_name, AccessType::WRITE, std::move(desc_new));
 }
 
-absl::Status GPUOperation::UpdateParams() {
-  for (size_t i = 0; i < src_tensors_names_.size(); ++i) {
+absl::Status GPUOperation::UpdateParams()
+{
+  for (size_t i = 0; i < src_tensors_names_.size(); ++i)
+  {
     RETURN_IF_ERROR(args_.SetObjectRef(src_tensors_names_[i], src_[i]));
   }
-  for (size_t i = 0; i < dst_tensors_names_.size(); ++i) {
+  for (size_t i = 0; i < dst_tensors_names_.size(); ++i)
+  {
     RETURN_IF_ERROR(args_.SetObjectRef(dst_tensors_names_[i], dst_[i]));
   }
   RETURN_IF_ERROR(BindArguments(&args_));
   grid_size_ = GetGridSize();
-  work_groups_count_ = GetWorkGroupsCount(
-      grid_dimension_, grid_size_, work_group_size_, work_group_launch_order_);
+  work_groups_count_ =
+    GetWorkGroupsCount(grid_dimension_, grid_size_, work_group_size_, work_group_launch_order_);
   return absl::OkStatus();
 }
 
-absl::Status GPUOperation::AssembleCode(const DeviceInfo& device_info,
-                                        CLContext* context) {
-  if (elementwise_) {
-    auto src_desc =
-        absl::make_unique<TensorDescriptor>(definition_.src_tensors[0]);
-    if (definition_.IsBatchSupported()) {
+absl::Status GPUOperation::AssembleCode(const DeviceInfo &device_info, CLContext *context)
+{
+  if (elementwise_)
+  {
+    auto src_desc = absl::make_unique<TensorDescriptor>(definition_.src_tensors[0]);
+    if (definition_.IsBatchSupported())
+    {
       src_desc->SetStateVar("BatchedWidth", "true");
     }
     src_tensors_names_.insert(src_tensors_names_.begin(), "src_tensor");
     args_.AddObjectRef("src_tensor", AccessType::READ, std::move(src_desc));
 
-    auto dst_desc =
-        absl::make_unique<TensorDescriptor>(definition_.dst_tensors[0]);
-    if (definition_.IsBatchSupported()) {
+    auto dst_desc = absl::make_unique<TensorDescriptor>(definition_.dst_tensors[0]);
+    if (definition_.IsBatchSupported())
+    {
       dst_desc->SetStateVar("BatchedWidth", "true");
     }
     dst_tensors_names_.insert(dst_tensors_names_.begin(), "dst_tensor");
@@ -260,69 +264,73 @@ absl::Status GPUOperation::AssembleCode(const DeviceInfo& device_info,
     elementwise_code_ = "{\n" + code_ + "\n}\n" + elementwise_code_;
     code_ = GetElementWiseCode(definition_, check_src_channels_size_);
     RETURN_IF_ERROR(args_.AllocateObjects(context));
-    RETURN_IF_ERROR(args_.TransformToCLCode(
-        device_info, {{dst_tensors_names_[0], elementwise_code_}}, &code_));
-  } else {
+    RETURN_IF_ERROR(
+      args_.TransformToCLCode(device_info, {{dst_tensors_names_[0], elementwise_code_}}, &code_));
+  }
+  else
+  {
     RETURN_IF_ERROR(args_.AllocateObjects(context));
-    RETURN_IF_ERROR(args_.TransformToCLCode(
-        device_info, {{dst_tensors_names_[0], elementwise_code_}}, &code_));
+    RETURN_IF_ERROR(
+      args_.TransformToCLCode(device_info, {{dst_tensors_names_[0], elementwise_code_}}, &code_));
   }
   return absl::OkStatus();
 }
 
-absl::Status GPUOperation::Compile(const CreationContext& creation_context) {
-  RETURN_IF_ERROR(
-      AssembleCode(creation_context.GetDeviceInfo(), creation_context.context));
+absl::Status GPUOperation::Compile(const CreationContext &creation_context)
+{
+  RETURN_IF_ERROR(AssembleCode(creation_context.GetDeviceInfo(), creation_context.context));
   RETURN_IF_ERROR(creation_context.cache->GetOrCreateCLKernel(
-      code_, "main_function", compiler_options_, *creation_context.context,
-      *creation_context.device, &kernel_));
+    code_, "main_function", compiler_options_, *creation_context.context, *creation_context.device,
+    &kernel_));
   return PostCompileCheck(creation_context.device->info_, kernel_.info_);
 }
 
-absl::Status GPUOperation::CompileDeserialized(
-    const CreationContext& creation_context) {
-  return creation_context.cache->GetOrCreateCLKernel(
-      code_, "main_function", compiler_options_, *creation_context.context,
-      *creation_context.device, &kernel_);
+absl::Status GPUOperation::CompileDeserialized(const CreationContext &creation_context)
+{
+  return creation_context.cache->GetOrCreateCLKernel(code_, "main_function", compiler_options_,
+                                                     *creation_context.context,
+                                                     *creation_context.device, &kernel_);
 }
 
-void GPUOperation::GetPossibleKernelWorkGroups(
-    TuningType tuning_type, const DeviceInfo& device_info,
-    const KernelInfo& kernel_info, std::vector<int3>* work_groups) const {
-  GetPossibleWorkGroups(tuning_type, device_info, kernel_info, grid_size_,
-                        work_groups);
+void GPUOperation::GetPossibleKernelWorkGroups(TuningType tuning_type,
+                                               const DeviceInfo &device_info,
+                                               const KernelInfo &kernel_info,
+                                               std::vector<int3> *work_groups) const
+{
+  GetPossibleWorkGroups(tuning_type, device_info, kernel_info, grid_size_, work_groups);
 }
 
-absl::Status GPUOperation::Tune(const TuningParameters& params) {
+absl::Status GPUOperation::Tune(const TuningParameters &params)
+{
   std::vector<int3> possible_work_groups;
   GetPossibleKernelWorkGroups(params.tuning_type, *params.info, kernel_.info_,
                               &possible_work_groups);
-  if (possible_work_groups.empty()) {
-    return absl::NotFoundError(
-        "Can not found work_group size to launch kernel");
+  if (possible_work_groups.empty())
+  {
+    return absl::NotFoundError("Can not found work_group size to launch kernel");
   }
-  if (possible_work_groups.size() == 1) {
+  if (possible_work_groups.size() == 1)
+  {
     work_group_size_ = possible_work_groups[0];
     work_groups_count_ =
-        GetWorkGroupsCount(grid_dimension_, grid_size_, work_group_size_,
-                           work_group_launch_order_);
+      GetWorkGroupsCount(grid_dimension_, grid_size_, work_group_size_, work_group_launch_order_);
     return absl::OkStatus();
-  } else {
+  }
+  else
+  {
     std::vector<int3> work_groups_count(possible_work_groups.size());
-    for (size_t i = 0; i < work_groups_count.size(); ++i) {
-      work_groups_count[i] =
-          GetWorkGroupsCount(grid_dimension_, grid_size_,
-                             possible_work_groups[i], work_group_launch_order_);
+    for (size_t i = 0; i < work_groups_count.size(); ++i)
+    {
+      work_groups_count[i] = GetWorkGroupsCount(grid_dimension_, grid_size_,
+                                                possible_work_groups[i], work_group_launch_order_);
     }
     RETURN_IF_ERROR(args_.Bind(kernel_.kernel()));
     int best_work_group_index;
     RETURN_IF_ERROR(params.queue->GetBestWorkGroupIndex(
-        kernel_, *params.info, work_groups_count, possible_work_groups,
-        &best_work_group_index));
+      kernel_, *params.info, work_groups_count, possible_work_groups, &best_work_group_index));
     work_group_size_ = possible_work_groups[best_work_group_index];
     work_groups_count_ =
-        GetWorkGroupsCount(grid_dimension_, grid_size_, work_group_size_,
-                           work_group_launch_order_);
+      GetWorkGroupsCount(grid_dimension_, grid_size_, work_group_size_, work_group_launch_order_);
     return absl::OkStatus();
   }
 }
