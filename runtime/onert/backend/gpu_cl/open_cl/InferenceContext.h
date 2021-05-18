@@ -85,27 +85,30 @@ public:
   class TensorReserver
   {
   public:
-    ValueId Add(const DummyTensor &dummy)
+    ValueId Add(const std::shared_ptr<DummyTensor> dummy)
     {
-      reservations_[next_] = dummy;
+      reservations_[next_] = std::move(dummy);
       return next_++;
     }
-    void Add(ValueId id, const DummyTensor &dummy) { reservations_[id] = dummy; }
+    void Add(ValueId id, const std::shared_ptr<DummyTensor> dummy)
+    {
+      reservations_[id] = std::move(dummy);
+    }
     void SetNext(ValueId id) { next_ = id; }
     bool HaveTensor(ValueId id) { return reservations_.find(id) != reservations_.end(); }
-    DummyTensor Get(ValueId id) { return reservations_[id]; }
+    std::shared_ptr<DummyTensor> Get(ValueId id) { return reservations_[id]; }
 
     std::vector<std::pair<ValueId, TensorDescriptor>> GetTensorDescs() const
     {
       std::vector<std::pair<ValueId, TensorDescriptor>> result;
       for (auto &v : reservations_)
       {
-        TensorDescriptor desc = v.second.descriptor;
-        desc.shape.b = v.second.shape.b;
-        desc.shape.h = v.second.shape.h;
-        desc.shape.w = v.second.shape.w;
+        TensorDescriptor desc = v.second->descriptor;
+        desc.shape.b = v.second->shape.b;
+        desc.shape.h = v.second->shape.h;
+        desc.shape.w = v.second->shape.w;
         desc.shape.d = 1;
-        desc.shape.c = v.second.shape.c;
+        desc.shape.c = v.second->shape.c;
         result.push_back({v.first, desc});
       }
       return result;
@@ -115,49 +118,20 @@ public:
     {
       for (auto &v : tensors)
       {
-        DummyTensor dummy;
-        dummy.descriptor = v.second;
-        dummy.shape.b = v.second.shape.b;
-        dummy.shape.h = v.second.shape.h;
-        dummy.shape.w = v.second.shape.w;
-        dummy.shape.c = v.second.shape.c;
+        auto dummy = std::make_shared<DummyTensor>();
+        dummy->descriptor = v.second;
+        dummy->shape.b = v.second.shape.b;
+        dummy->shape.h = v.second.shape.h;
+        dummy->shape.w = v.second.shape.w;
+        dummy->shape.c = v.second.shape.c;
         Add(v.first, dummy);
       }
     }
 
   private:
-    std::unordered_map<ValueId, DummyTensor> reservations_;
+    std::unordered_map<ValueId, std::shared_ptr<DummyTensor>> reservations_;
     ValueId next_;
   };
-  bool InitFromGraph(const CreateInferenceInfo &create_info, const GraphFloat32 &graph,
-                     Environment *env, std::vector<uint8_t> *serialized_model = nullptr);
-
-  // Applies OpenCL-specific transformations to the graph before the
-  // initialization. These transformations are either impossible or useless in
-  // other backends.
-  bool InitFromGraphWithTransforms(const CreateInferenceInfo &create_info, GraphFloat32 *graph,
-                                   Environment *env,
-                                   std::vector<uint8_t> *serialized_model = nullptr);
-
-  bool AddToQueue(CLCommandQueue *queue);
-  // bool Profile(ProfilingCommandQueue* queue, ProfilingInfo* result);
-  // for profiling and memory statistics
-  uint64_t GetSizeOfMemoryAllocatedForIntermediateTensors() const;
-
-  // bool SetInputTensor(ValueId id, const TensorFloat32& tensor,
-  //                             CLCommandQueue* queue);
-
-  // It will work only with input/output tensor ids. For all other ids we don't
-  // have any guarantees.
-  Tensor *GetTensor(ValueId id);
-
-  // bool GetOutputTensor(ValueId id, CLCommandQueue* queue,
-  //                              TensorFloat32* result);
-
-  const std::vector<ValueId> &GetInputIds() const { return input_ids_; }
-  const std::vector<ValueId> &GetOutputIds() const { return output_ids_; }
-
-  bool RestoreDeserialized(const std::vector<uint8_t> &serialized_model, Environment *env);
 
 private:
   enum TensorMemoryType
@@ -167,13 +141,6 @@ private:
     VARIABLE = 2
   };
 
-  // friend flatbuffers::Offset<data::InferenceContext> Encode(
-  //     const InferenceContext& inference,
-  //     flatbuffers::FlatBufferBuilder* builder);
-  // friend bool Decode(CLContext* context,
-  //                            const data::InferenceContext* fb_inference,
-  //                            InferenceContext* inference);
-
   void CopyInAndOutIds(const GraphFloat32 &graph);
   // bool ConvertOperations(const DeviceInfo& device_info,
   //                                const GraphFloat32& graph, ModelHints hints);
@@ -181,23 +148,6 @@ private:
   void ReserveGraphTensors(const CreateInferenceInfo &create_info, const DeviceInfo &device_info,
                            const GraphFloat32 &graph);
   bool Merge();
-  bool AllocateMemory(CLContext *context);
-
-  bool AllocateMemoryForVariableTensors(CLContext *context);
-
-  bool AllocateMemoryForBuffers(CLContext *context);
-
-  bool AllocateMemoryForStrongShapes(CLContext *context);
-
-  // utility function
-  void GetUsages(const std::function<bool(ValueId)> &functor, std::map<ValueId, int2> *usages);
-
-  TensorMemoryType GetTensorMemoryType(ValueId id);
-
-  void BindMemoryToOperations();
-  bool Compile(const CreationContext &creation_context);
-  bool Tune(const TuningParameters &tuning_parameters);
-  bool UpdateParams();
 
   // performance hacks
   bool need_flush_ = false;

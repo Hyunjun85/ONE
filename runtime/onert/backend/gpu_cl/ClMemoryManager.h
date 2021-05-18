@@ -47,8 +47,8 @@ public:
     {
       auto tensor = tensor_entry.second;
       const auto &t = tensor_reserver_.Get(tensor_entry.first.value());
-      const auto &shape = t.shape;
-      const auto &descriptor = t.descriptor;
+      const auto &shape = t->shape;
+      const auto &descriptor = t->descriptor;
       CreateTensor(*_context, shape, descriptor, tensor->handle());
     }
   }
@@ -104,7 +104,10 @@ public:
 
     ValueId id = ind.value();
     storage_type = SelectBestStorageType(device_info, t_shape, storage_type, data_type, layout);
-    tensor_reserver_.Add(id, {t_shape, TensorDescriptor{data_type, storage_type, layout}});
+    auto dummy = std::make_shared<InferenceContext::DummyTensor>();
+    dummy->shape = t_shape;
+    dummy->descriptor = TensorDescriptor{data_type, storage_type, layout};
+    tensor_reserver_.Add(id, dummy);
 
     max_id = std::max(max_id, id);
 
