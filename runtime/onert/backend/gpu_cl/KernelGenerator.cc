@@ -90,8 +90,7 @@ void KernelGenerator::visit(const ir::operation::BinaryArithmetic &node)
   std::unique_ptr<GPUOperation> gpu_op;
   switch (node.param().arithmetic_type)
   {
-    case ir::operation::BinaryArithmetic::ArithmeticType::ADD:
-    {
+    case ir::operation::BinaryArithmetic::ArithmeticType::ADD: {
       std::vector<int> channels(2);
       channels[0] = lhs_shape.c;
       channels[1] = rhs_shape.c;
@@ -107,18 +106,15 @@ void KernelGenerator::visit(const ir::operation::BinaryArithmetic &node)
       fn->configure(std::move(gpu_op), _creation_context);
       break;
     }
-    case ir::operation::BinaryArithmetic::ArithmeticType::SUB:
-    {
+    case ir::operation::BinaryArithmetic::ArithmeticType::SUB: {
       // NYI
       break;
     }
-    case ir::operation::BinaryArithmetic::ArithmeticType::MUL:
-    {
+    case ir::operation::BinaryArithmetic::ArithmeticType::MUL: {
       // NYI
       break;
     }
-    case ir::operation::BinaryArithmetic::ArithmeticType::DIV:
-    {
+    case ir::operation::BinaryArithmetic::ArithmeticType::DIV: {
       // NYI
       break;
     }
@@ -126,6 +122,70 @@ void KernelGenerator::visit(const ir::operation::BinaryArithmetic &node)
       assert(false && "The BinaryArithmetic operation supports only binary arithmetic operations");
       break;
   }
+
+  _return_fn = std::move(fn);
+}
+
+gpu_cl::Convolution2DAttributes convertConv2DParamForGPU(ir::operation::Conv2D::Param param)
+{
+  gpu_cl::Convolution2DAttributes attr;
+
+  /*
+  struct Param
+  {
+    Stride stride;
+    Padding padding;
+    Activation activation;
+    Dilation dilation;
+  };
+  ------------------------------------------
+  struct Convolution2DAttributes
+  {
+    HW strides = HW(1, 1);   // Along each axis.
+    HW dilations = HW(1, 1); // Along each axis.
+    Padding2D padding;
+    InternalTensor<OHWI, DataType::FLOAT32> weights;
+    InternalTensor<Linear, DataType::FLOAT32> bias; // optional
+  };
+  */
+  attr.strides = HW(param.stride.horizontal, param.stride.vertical);
+  attr.dilations = HW(param.dilation.height_factor, param.dilation.width_factor);
+
+  attr.padding.prepended = HW(param.padding.param.left, param.padding.param.top);
+  attr.padding.appended = HW(param.padding.param.right, param.padding.param.bottom);
+
+  return attr;
+}
+
+void KernelGenerator::visit(const ir::operation::Conv2D &node)
+{
+  auto fn = std::make_unique<ClFunction>();
+
+  auto inputs{node.getInputs()};
+  auto input{node.getInputs().at(ir::operation::Conv2D::INPUT)};
+  auto output{node.getOutputs().at(0)};
+
+  const auto param = node.param();
+
+  OperationDef op_def;
+  op_def.precision = CalculationsPrecision::F32;
+
+  op_def.src_tensors.push_back(_tensor_reg->getClTensorReserver(input)->descriptor);
+  auto rhs_shape = _tensor_reg->getClTensorReserver(input)->shape;
+
+  op_def.src_tensors.push_back(_tensor_reg->getClTensorReserver(output)->descriptor);
+  auto lhs_shape = _tensor_reg->getClTensorReserver(output)->shape;
+
+  gpu_cl::Convolution2DAttributes attr = convertConv2DParamForGPU(param);
+
+  ModelHints hints;
+  // std::vector<Value*>& input = getNodeInputs(node);
+  // std::vector<Value*>& output = getNodeOutputs(node);
+  GPUOperationsSubgraph *gpu_subgraph;
+
+  gpu_cl::Node op_node{1, Operation{"convolution_2d"}};
+
+  
 
   _return_fn = std::move(fn);
 }
