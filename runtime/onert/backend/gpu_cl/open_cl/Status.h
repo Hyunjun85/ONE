@@ -19,6 +19,7 @@
 #define __ONERT_BACKEND_GPU_CL_STATUS_H__
 
 #include "absl/status/status.h" // IWYU pragma: export
+
 #define RETURN_IF_ERROR(s) \
   {                        \
     auto c = (s);          \

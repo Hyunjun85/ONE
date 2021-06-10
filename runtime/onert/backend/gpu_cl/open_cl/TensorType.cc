@@ -980,6 +980,10 @@ bool TensorDescriptor::IsLinear() const
          storage_type == TensorStorageType::IMAGE_BUFFER;
 }
 
+bool TensorDescriptor::ReturnsZeroForNegOneRead() const {
+  return storage_type == TensorStorageType::IMAGE_BUFFER;
+}
+
 } // namespace gpu_cl
 } // namespace backend
 } // namespace onert

@@ -25,6 +25,8 @@
 
 #include "open_cl/kernels/Elementwise.h"
 #include "open_cl/selectors/SimpleSelectors.h"
+#include "open_cl/selectors/ConvolutionSelector.h"
+#include "open_cl/selectors/Subgraph.h"
 
 #include "ir/Operations.h"
 #include "ir/Operations.Include.h"
@@ -126,6 +128,74 @@ void KernelGenerator::visit(const ir::operation::BinaryArithmetic &node)
       break;
   }
 
+  _return_fn = std::move(fn);
+}
+
+gpu_cl::Convolution2DAttributes convertConv2DParamForGPU(ir::operation::Conv2D::Param param)
+{
+  gpu_cl::Convolution2DAttributes attr;
+
+  /*
+  struct Param
+  {
+    Stride stride;
+    Padding padding;
+    Activation activation;
+    Dilation dilation;
+  };
+  ------------------------------------------
+  struct Convolution2DAttributes
+  {
+    HW strides = HW(1, 1);   // Along each axis.
+    HW dilations = HW(1, 1); // Along each axis.
+    Padding2D padding;
+    InternalTensor<OHWI, DataType::FLOAT32> weights;
+    InternalTensor<Linear, DataType::FLOAT32> bias; // optional
+  };
+  */
+  attr.strides = HW(param.stride.horizontal, param.stride.vertical);
+  attr.dilations = HW(param.dilation.height_factor, param.dilation.width_factor);
+
+  attr.padding.prepended = HW(param.padding.param.left, param.padding.param.top);
+  attr.padding.appended = HW(param.padding.param.right, param.padding.param.bottom);
+
+  return attr;
+}
+
+void KernelGenerator::visit(const ir::operation::Conv2D &node)
+{
+  // Make Input/Output
+  auto input{node.getInputs().at(ir::operation::Conv2D::INPUT)};
+  auto kernel{node.getInputs().at(ir::operation::Conv2D::KERNEL)};
+  auto bias{node.getInputs().at(ir::operation::Conv2D::BIAS)};
+
+  auto output{node.getOutputs().at(0)};
+
+  const auto param = node.param();
+
+  auto fn = std::make_unique<ClFunction>();
+
+  OperationDef op_def;
+  op_def.precision = CalculationsPrecision::F32;
+
+  op_def.src_tensors.push_back(_tensor_reg->getClTensorReserver(input)->descriptor);
+  // auto input_shape = _tensor_reg->getClTensorReserver(input)->shape;
+  op_def.src_tensors.push_back(_tensor_reg->getClTensorReserver(kernel)->descriptor);
+  op_def.src_tensors.push_back(_tensor_reg->getClTensorReserver(bias)->descriptor);
+ 
+  op_def.dst_tensors.push_back(_tensor_reg->getClTensorReserver(output)->descriptor);
+  auto output_shape = _tensor_reg->getClTensorReserver(output)->shape;
+ 
+  gpu_cl::Convolution2DAttributes attr = convertConv2DParamForGPU(param/*, weight, bias*/);
+
+  gpu_cl::Node op_node{1, Operation{"convolution_2d", attr}};
+
+  ModelHints hints;
+
+  std::unique_ptr<GPUOperation> gpu_op; // = InitSingleOpSubgraph(inputs, outputs, gpu_subgraph);
+  gpu_op = SelectConvolution(attr, output_shape, _creation_context->GetDeviceInfo(), op_def, hints);
+
+  fn->configure(std::move(gpu_op), _creation_context);
   _return_fn = std::move(fn);
 }
 

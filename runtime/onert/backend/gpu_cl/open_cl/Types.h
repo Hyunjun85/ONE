@@ -22,6 +22,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <fp16.h>
+
 namespace onert
 {
 namespace backend
@@ -30,6 +32,22 @@ namespace gpu_cl
 {
 
 // TODO(akulik): make these types Google-style compliant.
+using HalfBits = uint16_t;
+
+class alignas(2) half {
+ public:
+  HalfBits bits;
+
+  half() = default;
+
+  half(const half& f) : bits(f.bits) {}
+
+  explicit half(float other) { bits = fp16_ieee_from_fp32_value(other); }
+
+  void operator=(float f) { *this = half(f); }
+
+  operator float() const { return fp16_ieee_to_fp32_value(bits); }
+};
 
 template <typename T> struct alignas(sizeof(T)) Vec4
 {
@@ -169,6 +187,7 @@ using int3 = Vec3<int32_t>;
 using uint3 = Vec3<uint32_t>;
 
 using float4 = Vec4<float>;
+using half4 = Vec4<half>;
 using byte4 = Vec4<int8_t>;
 using ubyte4 = Vec4<uint8_t>;
 using short4 = Vec4<int16_t>;
